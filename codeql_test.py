@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import subprocess
 
 from flask import Flask, request
 
@@ -10,8 +11,8 @@ app = Flask(__name__)
 def run_command():
     user_input = request.args.get("cmd", "")
 
-    # Command injection
-    os.system("echo " + user_input)
+    # Execute without invoking a shell to prevent command injection
+    subprocess.run(["echo", user_input], check=False)
 
     return "done"
 
