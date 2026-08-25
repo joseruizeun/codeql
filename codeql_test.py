@@ -1,24 +1,36 @@
-# codeql_test.py
-# Intentionally vulnerable code for testing CodeQL security scanning setup.
-# Do NOT use these patterns in real code.
-
 import os
 import sqlite3
 
+from flask import Flask, request
 
-def run_command(user_input):
-    # Command injection (CWE-78)
+app = Flask(__name__)
+
+
+@app.route("/run")
+def run_command():
+    user_input = request.args.get("cmd", "")
+
+    # Command injection
     os.system("echo " + user_input)
 
+    return "done"
 
-def get_user(db_path, username):
-    # SQL injection (CWE-89)
+
+@app.route("/user")
+def get_user():
+    db_path = "users.db"
+    username = request.args.get("username", "")
+
+    # SQL injection
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+
     query = "SELECT * FROM users WHERE name = '" + username + "'"
+
     cursor.execute(query)
-    return cursor.fetchall()
+
+    return str(cursor.fetchall())
 
 
 if __name__ == "__main__":
-    run_command("test")
+    app.run()
