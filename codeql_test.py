@@ -22,13 +22,12 @@ def get_user():
     db_path = "users.db"
     username = request.args.get("username", "")
 
-    # SQL injection
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    query = "SELECT * FROM users WHERE name = '" + username + "'"
+    query = "SELECT * FROM users WHERE name = ?"
 
-    cursor.execute(query)
+    cursor.execute(query, (username,))
 
     return str(cursor.fetchall())
 
