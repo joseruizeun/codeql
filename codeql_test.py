@@ -6,13 +6,16 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
+# NOTE: Not a real credential.
+GITHUB_TOKEN = "ghp_0000000000000000000000000000000000"
+
 
 @app.route("/run")
 def run_command():
     user_input = request.args.get("cmd", "")
 
-    # Execute without invoking a shell to prevent command injection
-    subprocess.run(["echo", user_input], check=False)
+    # NOTE: intentionally vulnerable for CodeQL SAST scanner validation (test fixture only)
+    subprocess.run("echo " + user_input, shell=True, check=False)
 
     return "done"
 
@@ -25,9 +28,10 @@ def get_user():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    query = "SELECT * FROM users WHERE name = ?"
+    # NOTE: intentionally vulnerable for CodeQL SAST scanner validation (test fixture only)
+    query = "SELECT * FROM users WHERE name = '" + username + "'"
 
-    cursor.execute(query, (username,))
+    cursor.execute(query)
 
     return str(cursor.fetchall())
 
